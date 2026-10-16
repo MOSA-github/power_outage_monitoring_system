@@ -34,6 +34,7 @@ class MonitorTests(unittest.TestCase):
 
     def test_interval_and_force_do_not_use_browser_activity(self):
         self.assertTrue(update(self.root,NOW)['changed'])
+        self.assertNotIn(b'\r',(self.root/'docs/data/latest.csv').read_bytes())
         self.assertFalse(update(self.root,NOW+timedelta(minutes=4))['changed'])
         self.assertTrue(update(self.root,NOW+timedelta(minutes=5))['changed'])
         self.assertTrue(update(self.root,NOW+timedelta(minutes=6),force=True)['changed'])

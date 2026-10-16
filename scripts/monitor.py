@@ -42,9 +42,9 @@ def update(root, now=None, mode=None, interval=None, force=False):
     # Validate everything before changing tracked configuration or artifacts.
     write_json(root/'config/monitor.json',config)
     write_json(root/'docs/data/latest.json',rows)
-    output=io.StringIO();writer=csv.DictWriter(output,fieldnames=FIELDS);writer.writeheader()
+    output=io.StringIO();writer=csv.DictWriter(output,fieldnames=FIELDS,lineterminator='\n');writer.writeheader()
     writer.writerows([{k:('true' if v else 'false') if isinstance(v,bool) else v for k,v in row.items()} for row in rows])
-    (root/'docs/data/latest.csv').write_text(output.getvalue(),encoding='utf-8')
+    (root/'docs/data/latest.csv').write_text(output.getvalue(),encoding='utf-8',newline='\n')
     write_json(status_file,status)
     return {'changed':True,'state':status['state'],'mode':config['mode'],'device_count':len(rows)}
 
