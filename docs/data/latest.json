@@ -11,7 +11,7 @@
     "ble_rssi": -55.0,
     "node_rssi": -85.0,
     "is_demo": true,
-    "measured_at": "2026-10-17T05:28:10+09:00"
+    "measured_at": "2026-10-17T05:28:20+09:00"
   },
   {
     "sensor_id": "switchbot-002",
@@ -25,7 +25,7 @@
     "ble_rssi": -56.0,
     "node_rssi": -61.0,
     "is_demo": true,
-    "measured_at": "2026-10-17T05:28:10+09:00"
+    "measured_at": "2026-10-17T05:28:20+09:00"
   },
   {
     "sensor_id": "switchbot-003",
@@ -39,6 +39,6 @@
     "ble_rssi": -57.0,
     "node_rssi": -62.0,
     "is_demo": true,
-    "measured_at": "2026-10-17T05:28:10+09:00"
+    "measured_at": "2026-10-17T05:28:20+09:00"
   }
 ]
