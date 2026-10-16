@@ -1,4 +1,4 @@
 sensor_id,name,type,value,unit,status,power_state,switch_on,ble_rssi,node_rssi,is_demo,measured_at
-switchbot-001,監視ポイント1,outage,0.0,W,warning,0W_ALERT,true,-55.0,-60.0,true,2026-10-17T05:36:36+09:00
-switchbot-002,監視ポイント2,outage,,W,offline,OFFLINE,,-56.0,-61.0,true,2026-10-17T05:36:36+09:00
-switchbot-003,監視ポイント3,outage,28.7,W,warning,NODE_WEAK,true,-57.0,-85.0,true,2026-10-17T05:36:36+09:00
+switchbot-001,監視ポイント1,outage,0.0,W,warning,SWITCH_OFF,false,-55.0,-60.0,true,2026-10-17T05:42:35+09:00
+switchbot-002,監視ポイント2,outage,23.8,W,warning,BLE_WEAK,true,-95.0,-61.0,true,2026-10-17T05:42:35+09:00
+switchbot-003,監視ポイント3,outage,28.8,W,normal,NORMAL,true,-57.0,-62.0,true,2026-10-17T05:42:35+09:00
