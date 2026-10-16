@@ -24,13 +24,44 @@ class MonitorTests(unittest.TestCase):
         write_json(self.root/'config/monitor.json',copy.deepcopy(CONFIG));write_json(self.root/'data/real/latest.json',[])
     def tearDown(self):self.temp.cleanup()
 
-    def test_all_six_dummy_states_have_explicit_demo_flag_and_japan_time(self):
-        states=set()
-        for index in range(6):
-            row=dummy(CONFIG,NOW+timedelta(minutes=5*index))[0];states.add(row['power_state'])
-            self.assertTrue(row['is_demo']);self.assertTrue(row['measured_at'].endswith('+09:00'));self.assertEqual(row['sensor_id'],'switchbot-001')
-            if row['power_state']=='OFFLINE':self.assertIsNone(row['value']);self.assertIsNone(row['switch_on'])
-        self.assertEqual(states,{'NORMAL','0W_ALERT','SWITCH_OFF','OFFLINE','BLE_WEAK','NODE_WEAK'})
+    def test_two_dummy_states_stay_fixed_while_power_and_rssi_vary(self):
+        config=read_json(ROOT/'config/monitor.json')
+        self.assertEqual([device['id'] for device in config['devices']],['switchbot-001','switchbot-002'])
+        power=set();ble={ident:set() for ident in ('switchbot-001','switchbot-002')};node=copy.deepcopy(ble)
+        for interval in (5,7,60,1440):
+            config['interval_minutes']=interval
+            for index in range(30):
+                rows=dummy(config,NOW+timedelta(minutes=interval*index))
+                for row in rows:
+                    ident=row['sensor_id'];self.assertTrue(row['is_demo']);self.assertTrue(row['measured_at'].endswith('+09:00'))
+                    ble[ident].add(row['ble_rssi']);node[ident].add(row['node_rssi'])
+                    self.assertTrue(-57<=row['ble_rssi']<=-53);self.assertTrue(-62<=row['node_rssi']<=-58)
+                    if ident=='switchbot-001':
+                        self.assertEqual(row['power_state'],'OFFLINE');self.assertEqual(row['status'],'offline')
+                        self.assertIsNone(row['value']);self.assertIsNone(row['switch_on'])
+                    else:
+                        self.assertEqual(row['power_state'],'NORMAL');self.assertEqual(row['status'],'normal');self.assertTrue(row['switch_on'])
+                        self.assertTrue(31.5<=row['value']<=33.5);power.add(row['value'])
+        self.assertGreater(len(power),1)
+        for ident in ble:self.assertGreater(len(ble[ident]),1);self.assertGreater(len(node[ident]),1)
+        before={row['sensor_id']:row for row in dummy(config,NOW)}
+        config['devices'].reverse()
+        self.assertEqual({row['sensor_id']:row for row in dummy(config,NOW)},before)
+
+    def test_two_dummy_records_are_published_without_third_device(self):
+        config=read_json(ROOT/'config/monitor.json');config['mode']='dummy'
+        write_json(self.root/'config/monitor.json',config)
+        update(self.root,NOW,force=True)
+        self.assertEqual(read_json(self.root/'docs/data/status.json')['device_count'],2)
+        rows=read_json(self.root/'docs/data/latest.json')
+        self.assertEqual([row['power_state'] for row in rows],['OFFLINE','NORMAL'])
+        self.assertEqual([row['sensor_id'] for row in rows],['switchbot-001','switchbot-002'])
+
+    def test_real_states_remain_supported(self):
+        for state in ('NORMAL','0W_ALERT','SWITCH_OFF','OFFLINE','BLE_WEAK','NODE_WEAK','UNKNOWN'):
+            row=normalize({'power_state':state,'value':0 if state in ('0W_ALERT','SWITCH_OFF') else 20,
+                           'measured_at':NOW.isoformat()},CONFIG['devices'][0],False)
+            self.assertEqual(row['power_state'],state);self.assertFalse(row['is_demo'])
 
     def test_interval_and_force_do_not_use_browser_activity(self):
         self.assertTrue(update(self.root,NOW)['changed'])

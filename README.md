@@ -8,7 +8,9 @@
 2. 「更新設定」→ 既存MOSAdemy管理者でログイン。
 3. ダミー／実機と更新周期（5〜1440分）を選択 →「設定を反映」。即時更新は「今すぐ更新」。
 
-初期値はダミー・5分・3ポイント。ページを閉じてもActionsが更新します。画面の1分ごとのJSON確認と、データ自体の生成周期は別です。日時は日本時間・24時間表示。設定反映中はボタンを無効化し、完了・失敗はActionsリンクで確認します。
+初期値はダミー・5分・2ポイント。ページを閉じてもActionsが更新します。画面の1分ごとのJSON確認と、データ自体の生成周期は別です。日時は日本時間・24時間表示。設定反映中はボタンを無効化し、完了・失敗はActionsリンクで確認します。
+
+ダミーの状態は固定です。`switchbot-001`は停電想定（`OFFLINE`）、`switchbot-002`は通電（`NORMAL`）。通電側の消費電力は31.5〜33.5 W、両方の電波強度は基準値から±2 dBmの範囲で変動します。停電側は既存の欠損ルールに従い`value`・`switch_on`をnullにし、0Wの実測値とは区別します。更新や周期変更で`power_state`は変わりません。実機モードの判定は変更しません。
 
 GitHub Actionsのscheduleは遅延・未実行があり得ます。[公式仕様](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule)。既存data-server側の1分確認タイマーでも期限到達時に同じ`monitor.yml`を起動し、生成・検証・公開処理はActionsに一本化します。指定時刻ちょうどの更新を保証するものではありません。
 

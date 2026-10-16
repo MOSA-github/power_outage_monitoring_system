@@ -64,11 +64,13 @@ def normalize(record, device, demo=False):
 def dummy(config, now):
     slot=int(now.timestamp())//(config['interval_minutes']*60)
     rows=[]
-    for index,device in enumerate(config['devices']):
-        state=STATES[(slot+index*2)%6]
-        value=0 if state in ('0W_ALERT','SWITCH_OFF') else round(18+index*5+(slot%17)/10,1)
-        rows.append(normalize({'power_state':state,'value':value,'ble_rssi':-95 if state=='BLE_WEAK' else -55-index,
-                               'node_rssi':-85 if state=='NODE_WEAK' else -60-index,'measured_at':now.isoformat()},device,True))
+    for device in config['devices']:
+        # Bind the fixed outage scenario to its stable ID, not order or time.
+        state='OFFLINE' if device['id']=='switchbot-001' else 'NORMAL'
+        offset=sum(device['id'].encode('utf-8'))
+        value=None if state=='OFFLINE' else round(32.5+((slot+offset)%21-10)/10,1)
+        rows.append(normalize({'power_state':state,'value':value,'ble_rssi':-55+(slot+offset)%5-2,
+                               'node_rssi':-60+(slot+offset*2)%5-2,'measured_at':now.isoformat()},device,True))
     return rows
 
 
