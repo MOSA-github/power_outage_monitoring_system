@@ -1,44 +1,30 @@
 [
   {
     "sensor_id": "switchbot-001",
-    "name": "監視ポイント1",
+    "name": "停電（ダミー）",
     "type": "outage",
-    "value": 19.0,
+    "value": null,
     "unit": "W",
-    "status": "warning",
-    "power_state": "BLE_WEAK",
-    "switch_on": true,
-    "ble_rssi": -95.0,
-    "node_rssi": -60.0,
+    "status": "offline",
+    "power_state": "OFFLINE",
+    "switch_on": null,
+    "ble_rssi": -57.0,
+    "node_rssi": -59.0,
     "is_demo": true,
-    "measured_at": "2026-10-17T05:54:33+09:00"
+    "measured_at": "2026-10-17T05:56:50+09:00"
   },
   {
     "sensor_id": "switchbot-002",
-    "name": "監視ポイント2",
+    "name": "通電（ダミー）",
     "type": "outage",
-    "value": 24.0,
+    "value": 32.7,
     "unit": "W",
     "status": "normal",
     "power_state": "NORMAL",
     "switch_on": true,
     "ble_rssi": -56.0,
-    "node_rssi": -61.0,
-    "is_demo": true,
-    "measured_at": "2026-10-17T05:54:33+09:00"
-  },
-  {
-    "sensor_id": "switchbot-003",
-    "name": "監視ポイント3",
-    "type": "outage",
-    "value": 0.0,
-    "unit": "W",
-    "status": "warning",
-    "power_state": "SWITCH_OFF",
-    "switch_on": false,
-    "ble_rssi": -57.0,
     "node_rssi": -62.0,
     "is_demo": true,
-    "measured_at": "2026-10-17T05:54:33+09:00"
+    "measured_at": "2026-10-17T05:56:50+09:00"
   }
 ]
