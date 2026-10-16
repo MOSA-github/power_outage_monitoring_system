@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="ja">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="SwitchBot停電感知の検証データとRaspberry Pi実機データ"><title>停電監視 | MOSAdemy</title><link rel="stylesheet" href="assets/style.css"></head>
+<body>
+<header><a class="brand" href="./"><span>M</span>MOSAdemy</a><nav><a href="https://app2.mosademy.tech/admin/outage-monitor" id="settingsLink">更新設定</a><a href="https://github.com/MOSA-github/power_outage_monitoring_system">GitHub ↗</a></nav></header>
+<main>
+  <section class="intro"><div><p class="eyebrow">SWITCHBOT / 電源状態</p><h1>停電監視</h1><p class="muted">監視ポイントごとの通電・停止・通信状態</p></div><span id="modeBadge" class="badge">確認中</span></section>
+  <aside id="modeNotice" class="notice" role="status">公開データを読み込み中</aside>
+  <section class="summary" aria-label="更新状態"><div><span>動作モード</span><strong id="mode">—</strong></div><div><span>設定した更新周期</span><strong id="interval">—</strong></div><div><span>データ生成時刻（日本時間）</span><strong id="generated">—</strong></div><div><span>次回更新目安（日本時間）</span><strong id="nextUpdate">—</strong></div></section>
+  <div class="section-heading"><h2>監視ポイント <small id="count">—件</small></h2><button id="refresh" type="button">表示を更新</button></div>
+  <p id="refreshState" class="muted" aria-live="polite">ページは1分ごとに公開JSONを確認します</p>
+  <section id="devices" class="devices" aria-live="polite"><p>読み込み中</p></section>
+  <section class="panel endpoints"><p class="eyebrow">連携用データ</p><h2>同じURLで、ダミーから実機へ</h2><p class="muted">JSONの <code>is_demo</code> でデータ区分を識別。通信途絶は停電確定ではありません。</p><div class="endpoint"><a id="jsonLink" href="data/latest.json">最新JSON ↗</a><button id="copyUrl" type="button">URLをコピー</button><a href="data/latest.csv">CSV ↗</a></div><code id="jsonUrl"></code><p id="copyResult" role="status"></p></section>
+  <section class="panel compact"><h2>設定・実機への切り替え</h2><p>「更新設定」から、ダミー／実機・更新周期を変更できます。操作には既存の管理者ログインを使います。</p><p class="muted">実機がない間はダミーモード。復旧後はRaspberry Piから実機データを送信し、実機モードへ切り替えます。</p><a href="https://github.com/MOSA-github/power_outage_monitoring_system#実機へ切り替える">実機の接続手順 ↗</a></section>
+</main>
+<footer><span>時刻は日本時間・24時間表示</span><a href="https://github.com/MOSA-github/power_outage_monitoring_system/actions/workflows/monitor.yml">自動更新の実行履歴 ↗</a></footer>
+<script src="assets/app.js" defer></script>
+</body></html>

@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "mode": "dummy",
+  "interval_minutes": 5,
+  "generated_at": "2026-10-17T05:25:26+09:00",
+  "next_update_at": "2026-10-17T05:30:26+09:00",
+  "state": "ready",
+  "device_count": 3,
+  "devices": [
+    {
+      "id": "switchbot-001",
+      "name": "監視ポイント1"
+    },
+    {
+      "id": "switchbot-002",
+      "name": "監視ポイント2"
+    },
+    {
+      "id": "switchbot-003",
+      "name": "監視ポイント3"
+    }
+  ]
+}

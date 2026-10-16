@@ -1,0 +1,75 @@
+name: Update outage data and publish Pages
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '3-58/5 * * * *'
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: '動作モード（空欄は変更なし）'
+        type: choice
+        options: ['', dummy, real]
+        default: ''
+      interval_minutes:
+        description: '更新周期（5〜1440分・空欄は変更なし）'
+        type: string
+        default: ''
+      force:
+        description: '今すぐ更新'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: outage-monitor-main
+  cancel-in-progress: false
+
+jobs:
+  update-and-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m unittest discover -s tests -v
+      - name: Generate approved public data
+        id: generate
+        env:
+          SELECTED_MODE: ${{ inputs.mode }}
+          SELECTED_INTERVAL: ${{ inputs.interval_minutes }}
+          FORCE_UPDATE: ${{ inputs.force }}
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          args=()
+          if [[ "$EVENT_NAME" == "push" || "$FORCE_UPDATE" == "true" ]]; then args+=(--force); fi
+          python scripts/monitor.py --mode "$SELECTED_MODE" --interval "$SELECTED_INTERVAL" "${args[@]}"
+      - name: Commit generated data and settings
+        if: steps.generate.outputs.changed == 'true'
+        run: |
+          git config user.name "mosademy-outage[bot]"
+          git config user.email "mosademy-outage[bot]@users.noreply.github.com"
+          git add config/monitor.json docs/data/
+          if ! git diff --cached --quiet; then
+            git commit -m "Update outage public data"
+            git push origin main
+          fi
+      - uses: actions/configure-pages@v5
+        if: steps.generate.outputs.changed == 'true'
+      - uses: actions/upload-pages-artifact@v3
+        if: steps.generate.outputs.changed == 'true'
+        with:
+          path: docs
+      - uses: actions/deploy-pages@v4
+        id: deployment
+        if: steps.generate.outputs.changed == 'true'

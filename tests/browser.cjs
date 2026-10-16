@@ -1,0 +1,35 @@
+const {chromium}=require('playwright');
+const fs=require('node:fs');
+const path=require('node:path');
+const assert=require('node:assert/strict');
+const root=path.resolve(__dirname,'../docs'),base='https://mosa-github.github.io/power_outage_monitoring_system/';
+let browser;
+(async()=>{
+  browser=await chromium.launch({channel:process.env.MOSA_TEST_BROWSER||'msedge',headless:true});
+  const page=await browser.newPage({viewport:{width:1280,height:960},timezoneId:'America/Los_Angeles'});await page.clock.install({time:new Date('2026-10-17T00:00:00Z')});
+  const errors=[],requests=[];page.on('pageerror',error=>errors.push(error.message));
+  let mode='dummy',failure=false;
+  const record={sensor_id:'switchbot-001',name:'監視1 <img src=x>',type:'outage',value:32.5,unit:'W',status:'normal',power_state:'NORMAL',switch_on:true,ble_rssi:-55,node_rssi:-60,is_demo:true,measured_at:'2026-10-17T09:00:00+09:00'};
+  await page.route('**/*',async route=>{
+    const url=new URL(route.request().url());requests.push(url.href);assert.equal(url.origin,new URL(base).origin);
+    const relative=url.pathname.slice(new URL(base).pathname.length);
+    if(relative==='data/status.json')return route.fulfill({json:{mode:mode==='dummy'?'dummy':'real',interval_minutes:5,generated_at:'2026-10-17T09:00:00+09:00',next_update_at:'2026-10-17T09:05:00+09:00',state:mode==='waiting'?'waiting_real':'ready'}});
+    if(relative==='data/latest.json')return failure?route.fulfill({status:503}):route.fulfill({json:mode==='waiting'?[]:mode==='real'?[{...record,is_demo:false,power_state:'OFFLINE',status:'offline',value:999}]:[record]});
+    if(['index.html','assets/app.js','assets/style.css'].includes(relative))return route.fulfill({contentType:relative.endsWith('.js')?'text/javascript':relative.endsWith('.css')?'text/css':'text/html',body:fs.readFileSync(path.join(root,relative))});
+    return route.abort();
+  });
+  await page.goto(base+'index.html');await page.locator('.device').waitFor();
+  assert.match(await page.locator('#modeNotice').textContent(),/検証用/);assert.equal(await page.locator('#generated').textContent(),'2026/10/17 09:00:00');
+  assert.equal(await page.locator('.device img').count(),0);assert.match(await page.locator('.device').textContent(),/32.5 W/);
+  assert.equal(await page.locator('#jsonUrl').textContent(),base+'data/latest.json');
+  assert.equal(await page.locator('#settingsLink').getAttribute('href'),'https://app2.mosademy.tech/admin/outage-monitor');
+  await page.clock.fastForward(60000);assert.equal(await page.locator('#generated').textContent(),'2026/10/17 09:00:00','A browser refresh does not invent new measurement timestamps');
+  mode='waiting';await page.locator('#refresh').click();await page.waitForFunction(()=>document.querySelector('#devices').textContent==='実機データ待ち');assert.match(await page.locator('#modeNotice').textContent(),/ダミーデータは表示しません/);
+  mode='real';await page.locator('#refresh').click();await page.locator('.device.offline').waitFor();assert.equal((await page.locator('.device').textContent()).includes('999'),false);assert.match(await page.locator('.device').textContent(),/消費電力 欠損/);
+  failure=true;await page.locator('#refresh').click();await page.waitForFunction(()=>document.querySelector('#refreshState').textContent.includes('取得できません'));assert.equal(await page.locator('.device').count(),1);
+  failure=false;mode='dummy';await page.locator('#refresh').click();await page.locator('.device.normal').waitFor();
+  if(process.env.MOSA_SCREENSHOT)await page.screenshot({path:process.env.MOSA_SCREENSHOT,fullPage:true});
+  await page.setViewportSize({width:390,height:844});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);assert.equal(await page.locator('.devices').evaluate(el=>getComputedStyle(el).gridTemplateColumns.split(' ').length),1);
+  assert.deepEqual(errors,[]);assert.equal(requests.some(url=>url.includes('token=')),false);
+  console.log('Public browser passed: dummy/real/waiting, stable URL, JST, XSS safety, offline missing value, refresh, failure and mobile');
+})().catch(error=>{console.error(error);process.exitCode=1}).finally(async()=>{if(browser)await browser.close()});
