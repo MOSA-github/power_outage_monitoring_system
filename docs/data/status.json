@@ -2,8 +2,8 @@
   "schema_version": 1,
   "mode": "dummy",
   "interval_minutes": 5,
-  "generated_at": "2026-10-17T09:44:33+09:00",
-  "next_update_at": "2026-10-17T09:49:33+09:00",
+  "generated_at": "2026-10-17T09:50:38+09:00",
+  "next_update_at": "2026-10-17T09:55:38+09:00",
   "state": "ready",
   "device_count": 2,
   "devices": [
