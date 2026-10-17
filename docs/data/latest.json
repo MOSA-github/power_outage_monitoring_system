@@ -8,23 +8,23 @@
     "status": "offline",
     "power_state": "OFFLINE",
     "switch_on": null,
-    "ble_rssi": -55.0,
-    "node_rssi": -62.0,
+    "ble_rssi": -54.0,
+    "node_rssi": -61.0,
     "is_demo": true,
-    "measured_at": "2026-10-17T16:31:35+09:00"
+    "measured_at": "2026-10-17T16:37:37+09:00"
   },
   {
     "sensor_id": "switchbot-002",
     "name": "通電（ダミー）",
     "type": "outage",
-    "value": 32.8,
+    "value": 32.9,
     "unit": "W",
     "status": "normal",
     "power_state": "NORMAL",
     "switch_on": true,
-    "ble_rssi": -54.0,
-    "node_rssi": -60.0,
+    "ble_rssi": -53.0,
+    "node_rssi": -59.0,
     "is_demo": true,
-    "measured_at": "2026-10-17T16:31:35+09:00"
+    "measured_at": "2026-10-17T16:37:37+09:00"
   }
 ]
